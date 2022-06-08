@@ -1,0 +1,644 @@
+openapi: 3.0.1
+info:
+  title: Smart Grocery API
+  description: Smart Grocery API to manage lists and analyze receipts.
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: jagdevb@mcmaster.ca
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: http://localhost:5000/v1
+- url: https://localhost:5000/v1
+tags:
+- name: Lists
+  description: Access to Grocery Lists
+- name: Receipts
+  description: Access to Receipt operations
+paths:
+  /lists:
+    get:
+      tags:
+      - Lists
+      summary: Retrieve all lists for a User
+      operationId: getLists
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetListsResponse'
+        403:
+          description: Forbidden
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+    post:
+      tags:
+      - Lists
+      summary: Create a new list
+      operationId: createList
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateListRequest'
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateResourceResponse'
+        400:
+          description: Bad Request
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+        
+  /lists/{list_id}:
+    delete:
+      tags:
+      - Lists
+      summary: Delete the given list
+      operationId: deleteList
+      parameters:
+      - name: list_id
+        in: path
+        description: List identifier
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Success
+        403:
+          description: Forbidden
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+    put:
+      tags:
+        - Lists
+      summary: Update list details
+      operationId: updateList
+      parameters:
+      - name: list_id
+        in: path
+        description: List identifier
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateListRequest'
+      responses:
+        200:
+          description: Success
+        403:
+          description: Forbidden
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+
+        
+  /lists/{list_id}/items:
+    get:
+      tags:
+      - Lists
+      summary: Retrieve all the items in the given list
+      operationId: getListItems
+      parameters:
+      - name: list_id
+        in: path
+        description: List identifier
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetListItemsResponse'
+        403:
+          description: Forbidden
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+    post:
+      tags:
+      - Lists
+      summary: Add new item in list
+      operationId: addItemToList
+      parameters:
+      - name: list_id
+        in: path
+        description: List identifier
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateItemRequest'
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateResourceResponse'
+        400:
+          description: Bad Request
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+        
+  /lists/{list_id}/items/{item_id}:
+    delete:
+      tags:
+      - Lists
+      summary: Delete the item from given list
+      operationId: deleteListItem
+      parameters:
+      - name: list_id
+        in: path
+        description: List identifier
+        required: true
+        schema:
+          type: string
+      - name: item_id
+        in: path
+        description: Item identifier
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Success
+        403:
+          description: Forbidden
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+    put:
+      tags:
+        - Lists
+      summary: Update item details
+      operationId: updateItem
+      parameters:
+      - name: list_id
+        in: path
+        description: List identifier
+        required: true
+        schema:
+          type: string
+      - name: item_id
+        in: path
+        description: Item identifier
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateItemRequest'
+      responses:
+        200:
+          description: Success
+        403:
+          description: Forbidden
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+
+  /lists/predict:
+    post:
+      tags:
+      - Lists
+      summary: Predict a new list
+      operationId: predictList
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PredictListRequest'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PredictListResponse'
+        400:
+          description: Bad Request
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+        
+  /receipts:
+    get:
+      tags:
+      - Receipts
+      summary: Get Receipts for given User
+      operationId: getReceipts
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetReceiptResponse'
+        403:
+          description: Forbidden
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+    post:
+      tags:
+      - Receipts
+      summary: Create a receipt
+      operationId: createReceipt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReceiptWithoutId'
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateResourceResponse'
+        400:
+          description: Bad Request
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+      
+        
+  /receipts/{receipt_id}:
+    delete:
+      tags:
+      - Receipts
+      summary: Delete a receipt
+      operationId: deleteReceipt
+      parameters:
+      - name: receipt_id
+        in: path
+        description: Receipt identifier
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Success
+        403:
+          description: Forbidden
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+
+  /receipts/scan:
+    post:
+      tags:
+      - Receipts
+      summary: Scan a receipt
+      operationId: scanReceipt
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ScanReceiptRequest'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiptScan'
+        403:
+          description: Forbidden
+        500:
+          description: Internal Server Error
+      security:
+      - grocery_auth:
+        - openid
+        
+components:
+
+  securitySchemes:
+    grocery_auth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://20.120.23.139:8443/realms/smart-grocery/protocol/openid-connect/auth
+          tokenUrl: https://20.120.23.139:8443/realms/smart-grocery/protocol/openid-connect/token
+          scopes:
+            openid: OpenID
+            
+  schemas:
+    PredictListRequest:
+      type: object
+      required:
+        - "date"
+      properties:
+        date:
+          type: string
+          example: "2022-03-19"
+          format: "YYYY-MM-DD"
+
+    PredictListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PredictionItem'
+
+    GetListsResponse:
+      type: object
+      properties:
+        lists:
+          type: array
+          items:
+            $ref: '#/components/schemas/List'
+            
+    GetListItemsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListItem'
+            
+    CreateListRequest:
+      type: object
+      required:
+        - "name"
+        - "creation_timestamp"
+      properties:
+        name:
+          type: string
+        creation_timestamp:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListItemWithoutId'
+          
+    CreateResourceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          
+    CreateItemRequest:
+      type: object
+      required:
+        - "category"
+        - "name"
+        - "quantity"
+      properties:
+        name:
+          type: string
+          description: Item name.
+        category:
+          type: string
+          description: Item category.
+        quantity:
+          type: string
+          description: Quantity of Item.
+
+    UpdateListRequest:
+      type: object
+      required:
+        - "name"
+      properties:
+        name:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListItemWithoutId'
+
+    UpdateItemRequest:
+      type: object
+      required:
+        - "name"
+        - "category"
+        - "quantity"
+      properties:
+        name:
+          type: string
+          description: Item name.
+        category:
+          type: string
+          description: Item category.
+        quantity:
+          type: string
+          description: Quantity of Item.
+          
+    GetReceiptResponse:
+      type: object
+      properties:
+        receipts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Receipt'            
+            
+    ScanReceiptRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+  
+    ListItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The List ID.
+        category:
+          type: string
+          description: Item category.
+        name:
+          type: string
+          description: Item name.
+        quantity:
+          type: number
+          description: Quantity of Item.
+
+    ListItemWithoutId:
+      type: object
+      properties:
+        category:
+          type: string
+          description: Item category.
+        name:
+          type: string
+          description: Item name.
+        quantity:
+          type: number
+          description: Quantity of Item.
+
+    PredictionItem:
+      type: object
+      properties:
+        category:
+          type: string
+          description: Item category.
+        name:
+          type: string
+          description: Item name.
+
+    List:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The List ID.
+        name:
+          type: string
+          description: The List name.
+        creation_timestamp:
+          type: string
+          description: The data and time of the list creation.
+        items:
+          description: The list of item ids for given list.
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/ListItem'
+    
+    Receipt:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The Receipt ID.
+        name:
+          type: string
+          description: The Receipt name.
+        creation_timestamp:
+          type: string
+          description: The Receipt creation date.
+        merchant_name:
+          type: string
+          description: The name of merchant on the receipt.
+        items:
+          type: array
+          description: List of items in the receipt.
+          items:
+            $ref: "#/components/schemas/ReceiptItemWithId"
+
+    ReceiptWithoutId:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The Receipt name.
+        creation_timestamp:
+          type: string
+          description: The Receipt creation date.
+        merchant_name:
+          type: string
+          description: The name of merchant on the receipt.
+        items:
+          type: array
+          description: List of items in the receipt.
+          items:
+            $ref: "#/components/schemas/ReceiptItem"
+
+    ReceiptScan:
+      type: object
+      properties:
+        creation_timestamp:
+          type: string
+          description: The Receipt creation date.
+        merchant_name:
+          type: string
+          description: The name of merchant on the receipt.
+        items:
+          type: array
+          description: List of items in the receipt.
+          items:
+            $ref: "#/components/schemas/ReceiptItem"
+
+    ReceiptItem:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of scanned item.
+        quantity:
+          type: string
+          description: Quantity of scanned item.
+        price:
+          type: number
+          description: Price of scanned item.
+        total_price:
+          type: number
+          description: Total price of scanned item according to quantity.
+
+    ReceiptItemWithId:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The Receipt Item ID.
+        name:
+          type: string
+          description: Name of scanned item.
+        quantity:
+          type: string
+          description: Quantity of scanned item.
+        price:
+          type: number
+          description: Price of scanned item.
+        total_price:
+          type: number
+          description: Total price of scanned item according to quantity.
+

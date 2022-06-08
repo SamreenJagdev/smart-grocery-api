@@ -1,0 +1,36 @@
+[{
+  "name": "Birthday Party",
+  "creation_timestamp": "2022-01-01 15:49:46.000",
+  "id": "d348077d-a686-4e3f-84fe-8c9612c72203",
+  "item_name": "Baking Powder",
+  "quantity": 1,
+  "category": "Baking"
+  },{
+      "name": "Birthday Party",
+      "creation_timestamp": "2022-03-19 15:49:46.000",
+      "id": "d348077d-a686-4e3f-84fe-8c9612c72203",
+      "item_name": "Salad",
+      "quantity": 1,
+      "category": "Snack"
+  },{
+    "name": "Birthday Party",
+    "creation_timestamp": "2022-09-30 15:49:46.000",
+    "id": "d348077d-a686-4e3f-84fe-8c9612c72203",
+    "item_name": "Banana",
+    "quantity": 1,
+    "category": "Fruit"
+    },{
+      "name": "Birthday Party",
+      "creation_timestamp": "2022-10-15 15:49:46.000",
+      "id": "d348077d-a686-4e3f-84fe-8c9612c72203",
+      "item_name": "Chips",
+      "quantity": 1,
+      "category": "Snack"
+    },{
+      "name": "Birthday Party",
+      "creation_timestamp": "2022-02-15 15:49:46.000",
+      "id": "d348077d-a686-4e3f-84fe-8c9612c72203",
+      "item_name": "Apple",
+      "quantity": 1,
+      "category": "Snack"     
+}]

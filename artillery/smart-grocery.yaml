@@ -1,0 +1,194 @@
+config:
+  target: "https://smart-grocery.ca/v1"
+  phases:
+  - duration: 1
+    arrivalRate: 1
+    name: Warm up
+  - duration: 30
+    arrivalRate: 1
+    name: Sustained load
+  payload:
+    path: "users.csv"
+    fields:
+    - "username"
+    - "password"
+    - "token"
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+  http:
+    timeout: 30
+  processor: './perf-functions.js'
+
+scenarios:
+- weight: 5
+  flow:
+  - log: "List Test for {{ username }}"
+  - post:
+      name: Create List
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/lists"
+      json:
+        name: New List 3
+        creation_timestamp: "2021-11-16 18:09:00.000000"
+        items:
+        - category: Veggie
+          quantity: 6.3
+          name: Carrot
+        - category: Fruit
+          quantity: 3
+          name: Banana
+        - category: Fruit
+          quantity: 2
+          name: Strawberry
+        - category: Fruit
+          quantity: 5
+          name: Apple
+      expect:
+        - statusCode: 201
+      capture:
+        json: "$.id"
+        as: list_id
+  - put:
+      name: Update List
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/lists/{{ list_id }}"
+      json:
+        name: New List 4
+        items:
+        - category: Veggie
+          quantity: 6.3
+          name: Brocolli
+        - category: Fruit
+          quantity: 3
+          name: Pear
+      expect:
+        - statusCode: 200
+  - get:
+      name: Get List Items
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/lists/{{ list_id }}/items"
+      expect:
+        - statusCode: 200
+  - post:
+      name: Create List Item
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/lists/{{ list_id }}/items"
+      json:
+        category: Fruits
+        name: Banana
+        price: 2
+        quantity: 10
+      expect:
+        - statusCode: 200
+      capture:
+        json: "$.id"
+        as: item_id
+  - put:
+      name: Update List Item
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/lists/{{ list_id }}/items/{{ item_id }}"
+      json:
+        name: Spinach
+        category: Green
+        price: 3
+        quantity: 15
+      expect:
+        - statusCode: 200
+  - delete:
+      name: Delete List Item
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/lists/{{ list_id }}/items/{{ item_id }}"
+      expect:
+        - statusCode: 200
+  - get:
+      name: Get List
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/lists"
+      expect:
+        - statusCode: 200
+  - delete:
+      name: Delete List
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/lists/{{ list_id }}"
+      expect:
+        - statusCode: 200
+  - post:
+      name: Pedict List
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/lists/predict"
+      expect:
+        - statusCode: 200
+
+
+- weight: 5
+  flow:
+  - log: "Receipt Test for {{ username }}"
+  - post:
+      name: Create Receipt
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/receipts"
+      json:
+        name: Recept 4
+        creation_timestamp: "2021-11-16 18:09:00.000000"
+        items:
+          - total_price: 5.79
+            price: 0
+            quantity: 0
+            name: RFP Cake Rusk Original 5 67g
+          - total_price: 2.14
+            price: 0
+            quantity: 0
+            name: Produce
+          - total_price: 4.99
+            price: 0
+            quantity: 0
+            name: Sultan Raw Cashew 200g
+          - total_price: 8.24
+            price: 0
+            quantity: 0
+            name: CHK Whole ASIS
+        merchant_name: Freshco
+      expect:
+        - statusCode: 201
+      capture:
+        json: "$.id"
+        as: receipt_id
+  - delete:
+      name: Delete Receipt
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/receipts/{{ receipt_id }}"
+      expect:
+        - statusCode: 200
+  - get:
+      name: Get Receipts
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/receipts"
+      expect:
+        - statusCode: 200
+
+- weight: 1
+  flow:
+  - log: "Receipt Scan Test for {{ username }}"
+  - post:
+      name: Scan Receipts
+      headers:
+        Authorization: 'Bearer {{ token }}'
+      url: "/receipts/scan"
+      beforeRequest: 'setFormBody'
+      formData:
+        temp: value
+      expect:
+        - statusCode: 200
