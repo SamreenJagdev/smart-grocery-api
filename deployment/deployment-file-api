@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-grocery-api
+spec:
+  selector:
+    matchLabels:
+      app: smart-grocery-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: smart-grocery-api
+    spec:
+      containers:
+      - name: smart-grocery-api
+        image: smart-grocery-api:0.0.3
+        env:
+        - name: FLASK_RUN_HOST
+          value: 0.0.0.0
+
+
+      
